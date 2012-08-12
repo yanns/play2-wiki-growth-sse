@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Wiki Growth - SSE</title>
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+</head>
+<body>
+
+    <button id="stop-stream" href="#" disabled="disabled">Stop streaming</button>
+
+    <h3 id="status"></h3>
+
+    <div id="debug"></div>
+
+    <canvas id="plan2d" width="2000" height="1000"></canvas>
+
+    <script type="text/javascript" charset="utf-8">
+        "strict"
+
+        jQuery(document).ready(function ($) {
+
+            var canvas = document.getElementById('plan2d'),
+                canvasContext = canvas.getContext('2d'),
+                canvasWidth = canvas.width,
+                canvasCenterX = canvas.width / 2
+                canvasHeight = canvas.height,
+                canvasCenterY =  canvas.height / 2;
+
+            // paint it black
+            canvasContext.fillStyle = '#000000';
+            canvasContext.fillRect (0, 0, canvas.width, canvas.height);
+            canvasContext.fillStyle = 'rgba(255,255,255,0.5)';
+
+            var PI2 = Math.PI * 2;
+            var feed,
+                eventsLength = 0;
+
+            if (!!window.EventSource) {
+                feed = new EventSource('/stream');
+
+                // connection was opened
+                feed.addEventListener('open', function (e) {
+                    $("#status").html("Connection open");
+                    $("#stop-stream").removeAttr("disabled");
+                }, false);
+
+                // receive message
+                feed.addEventListener('message', function(e) {
+                    $("#status").html("stream received");
+                    var data = JSON.parse(e.data);
+                    eventsLength += 1;
+
+                    canvasContext.beginPath();
+                    var x = canvasCenterX + data.longitude * canvasCenterX / 180,
+                        y = canvasCenterY - data.latitude  * canvasCenterY / 90;
+                    canvasContext.arc(x, y, 1, 0, PI2);
+                    canvasContext.fill();
+
+                    $('#debug').html( "number of points received: " + eventsLength );
+
+                }, false);
+
+                // error handling
+                feed.addEventListener('error', function (e) {
+                    if (e.readyState == EventSource.CLOSED) {
+                        $("#status").html("Connection closed");
+                        $("#stop-stream").attr("disabled", "disabled");
+                    } else {
+                        $("#status").html("Unknown error" + e);
+                        $("#stop-stream").attr("disabled", "disabled");
+                    }
+                }, false);
+
+            } else {
+                $("#status").html("Serverside Send Event not supported by this browser");
+            }
+
+            $("#stop-stream").click(function(e) {
+                e.preventDefault();
+                feed.close();
+                $("#status").html("Streaming stopped");
+                $(this).attr("disabled", "disabled");
+            }).attr("disabled", "disabled");
+        });
+
+    </script>
+
+</body>
+</html>
+
