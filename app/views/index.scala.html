@@ -14,12 +14,15 @@
 
     <div id="debug"></div>
 
-    <canvas id="plan2d" width="2000" height="1000"></canvas>
+    <canvas id="plan2d" width="4000" height="2000"></canvas>
 
     <script type="text/javascript" charset="utf-8">
         "strict"
 
         jQuery(document).ready(function ($) {
+
+            $('#plan2d').width(window.innerWidth - 30)
+                        .height(window.innerWidth / 2);
 
             var canvas = document.getElementById('plan2d'),
                 canvasContext = canvas.getContext('2d'),
