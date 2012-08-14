@@ -71,9 +71,10 @@
 
                 // error handling
                 feed.addEventListener('error', function (e) {
-                    if (e.readyState == EventSource.CLOSED) {
+                    if (e.eventPhase == EventSource.CLOSED) {
                         $("#status").html("Connection closed");
                         $("#stop-stream").attr("disabled", "disabled");
+                        feed.close();
                     } else {
                         $("#status").html("Unknown error" + e);
                         $("#stop-stream").attr("disabled", "disabled");

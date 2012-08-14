@@ -30,7 +30,7 @@ object Application extends Controller {
    * Stream of server send events
    */
   def stream() = Action {
-    Ok.feed(fileLineStream(Play.getExistingFile("conf/coosbyid.txt").get) &> lineParser &> validCoordinate &> asJson ><> EventSource()).as("text/event-stream")
+    Ok.stream(fileLineStream(Play.getExistingFile("conf/coosbyid.txt").get) &> lineParser &> validCoordinate &> asJson ><> EventSource()).as("text/event-stream")
   }
 
 }
