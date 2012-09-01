@@ -10,5 +10,8 @@ Each time a coordinate is found, it is send on the fly to the browser as Server 
 
 The browser displays this coordinate on a map, showing how wikipedia has spread over the world.
 
+The demo can be view [online on Heroku](http://wiki-growth.herokuapp.com/).
+The code is explained on a [blog post](http://yannexpress.blogspot.de/2012/08/handling-data-streams-with-play2-and.html).
+
 Yann
 @simon_yann
