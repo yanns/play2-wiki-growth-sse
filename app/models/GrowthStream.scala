@@ -3,7 +3,7 @@ package models
 import java.io.File
 import play.api.libs.iteratee.{Input, Enumeratee, Enumerator}
 import play.api.libs.concurrent.Promise
-import play.api.Logger
+import org.apache.commons.lang3.math.NumberUtils
 
 case class Coordinate(latitude: BigDecimal, longitude: BigDecimal)
 
@@ -26,29 +26,31 @@ object GrowthStream {
     }, source.close)
   }
 
-  /**
-   * try to parse one line to extract a [[models.Coordinate]]
-   */
-  val lineParser: Enumeratee[String, Option[Coordinate]] = Enumeratee.map[String] {
-    line =>
-      val elements = line.split("\t")
-      if (elements.length == 3) {
-        try {
-          Some(Coordinate(latitude  = elements(1).toDouble,
-                          longitude = elements(2).toDouble))
-        } catch {
-          case e: Exception => Logger.error("error while parsing line: " + line, e); None
-        }
+  object IsDouble {
+    def unapply(string: String): Option[Double] = {
+      if (NumberUtils.isNumber(string)) {
+        Some(string.toDouble)
       } else {
         None
       }
+    }
+  }
+
+  /**
+   * try to parse one line to extract a [[models.Coordinate]]
+   */
+  val lineParser: Enumeratee[String, Option[Coordinate]] = Enumeratee.map[String] { line =>
+    line.split("\t") match {
+      case Array(_, IsDouble(latitude), IsDouble(longitude)) => Some(Coordinate(latitude, longitude))
+      case _ => None
+    }
   }
 
   /**
    * keeps defined coordinates only
    */
   val validCoordinate: Enumeratee[Option[Coordinate], Coordinate] = Enumeratee.mapInput[Option[Coordinate]] {
-    case Input.El(maybe) if maybe.isDefined => Input.El(maybe.get)
+    case Input.El(Some(coordinate)) => Input.El(coordinate)
     case other => Input.Empty // ignore invalid coordinates
   }
 

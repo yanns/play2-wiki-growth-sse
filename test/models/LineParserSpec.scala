@@ -24,7 +24,7 @@ class LineParserSpec extends Specification {
 
   "An unparsable source line" should {
     "be filtered out" in {
-      val input = Enumerator("688\t-5.5\t10.3", "hello", "690\t12.51\t-70.01")
+      val input = Enumerator("688\t-5.5\t10.3", "hello", "690\t12.51\t-70.01", "a\tb\tc")
       val values = joinValues(input &> lineParser &> validCoordinate)
       values mustEqual List(Coordinate(-5.5,10.3), Coordinate(12.51, -70.01))
     }
