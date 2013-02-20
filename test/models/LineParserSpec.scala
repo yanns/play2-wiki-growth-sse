@@ -3,6 +3,8 @@ package models
 import org.specs2.mutable._
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import models.GrowthStream._
+import concurrent.duration.Duration
+import concurrent.Await
 
 class LineParserSpec extends Specification {
 
@@ -34,7 +36,7 @@ class LineParserSpec extends Specification {
    */
   private def joinValues[A](values: Enumerator[A]): List[A] = {
     val join = Iteratee.fold[A, List[A]](Nil)((list, el) => el :: list)
-    Iteratee.flatten(values |>> join).run[List[A]].value.get.reverse
+    Await.result(Iteratee.flatten(values |>> join).run, Duration.Inf).reverse
   }
 
 }
