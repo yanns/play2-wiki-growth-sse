@@ -2,7 +2,7 @@ package controllers
 
 import play.api._
 import libs.EventSource
-import libs.iteratee.Enumeratee
+import libs.iteratee.{Enumerator, Enumeratee}
 import libs.json.JsValue
 import play.api.mvc._
 import play.api.Play.current
@@ -30,7 +30,9 @@ object Application extends Controller {
    * Stream of server send events
    */
   def stream() = Action {
-    Ok.stream(fileLineStream(Play.getExistingFile("conf/coosbyid.txt").get) &> lineParser &> validCoordinate &> asJson ><> EventSource()).as("text/event-stream")
+    val jsonStream = fileLineStream(Play.getExistingFile("conf/coosbyid.txt").get) &> lineParser &> validCoordinate &> asJson
+    val eventDataStream = jsonStream &> EventSource()
+    Ok.stream(eventDataStream >>> Enumerator.eof).as("text/event-stream")
   }
 
 }
