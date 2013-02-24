@@ -2,8 +2,8 @@ package models
 
 import java.io.File
 import play.api.libs.iteratee.{Input, Enumeratee, Enumerator}
-import play.api.libs.concurrent.Promise
 import org.apache.commons.lang3.math.NumberUtils
+import concurrent.Future
 
 case class Coordinate(latitude: BigDecimal, longitude: BigDecimal)
 
@@ -16,13 +16,13 @@ object GrowthStream {
     val source = scala.io.Source.fromFile(file)
     val lines = source.getLines()
 
-    Enumerator.fromCallback[String] (() => {
+    Enumerator.fromCallback1[String] ( _ => {
       val line = if (lines.hasNext) {
         Some(lines.next())
       } else {
         None
       }
-      Promise.pure(line)
+      Future.successful(line)
     }, source.close)
   }
 
