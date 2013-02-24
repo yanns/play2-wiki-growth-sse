@@ -3,7 +3,7 @@ package controllers
 import play.api._
 import libs.EventSource
 import libs.iteratee.{Enumerator, Enumeratee}
-import libs.json.JsValue
+import libs.json.{Json, JsValue}
 import play.api.mvc._
 import play.api.Play.current
 import libs.json.Json._
@@ -20,10 +20,10 @@ object Application extends Controller {
    * convert a coordinate to JSON
    */
   val asJson: Enumeratee[Coordinate, JsValue] = Enumeratee.map[Coordinate] {
-    coordinate => toJson ( Map (
-      "latitude" -> toJson(coordinate.latitude.toString()),
-      "longitude" -> toJson(coordinate.longitude.toString())
-    ) )
+    coordinate => Json.obj(
+      "latitude" -> coordinate.latitude.toString(),
+      "longitude" -> coordinate.longitude.toString()
+    )
   }
 
   /**
