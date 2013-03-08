@@ -5,8 +5,22 @@ import play.api.libs.iteratee.{Iteratee, Enumerator}
 import models.GrowthStream._
 import concurrent.duration.Duration
 import concurrent.Await
+import io.Source
 
 class LineParserSpec extends Specification {
+
+  "lineEnumerator" should {
+    "enumerates lines from a source" in {
+      val source = Source.fromString(
+        """688	-5.5	10.3
+          |hello
+          |690	12.51	-70.01
+          |""".stripMargin)
+      val input = lineEnumerator(source)
+      val values = joinValues(input)
+      values mustEqual List("688\t-5.5\t10.3", "hello", "690\t12.51\t-70.01")
+    }
+  }
 
   "A source line" should {
     "be parsed" in {

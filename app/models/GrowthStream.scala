@@ -1,9 +1,9 @@
 package models
 
-import java.io.File
 import play.api.libs.iteratee.{Input, Enumeratee, Enumerator}
 import org.apache.commons.lang3.math.NumberUtils
 import concurrent.Future
+import io.Source
 
 case class Coordinate(latitude: BigDecimal, longitude: BigDecimal)
 
@@ -12,8 +12,7 @@ object GrowthStream {
   /**
    * Enumerates the lines of a file
    */
-  def fileLineStream(file: File) : Enumerator[String] = {
-    val source = scala.io.Source.fromFile(file)
+  def lineEnumerator(source: Source) : Enumerator[String] = {
     val lines = source.getLines()
 
     Enumerator.fromCallback1[String] ( _ => {

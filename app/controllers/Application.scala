@@ -30,7 +30,8 @@ object Application extends Controller {
    * Stream of server send events
    */
   def stream() = Action {
-    val jsonStream = fileLineStream(Play.getExistingFile("conf/coosbyid.txt").get) &> lineParser &> validCoordinate &> asJson
+    val source = scala.io.Source.fromFile(Play.getExistingFile("conf/coosbyid.txt").get)
+    val jsonStream = lineEnumerator(source) &> lineParser &> validCoordinate &> asJson
     val eventDataStream = jsonStream &> EventSource()
     Ok.stream(eventDataStream >>> Enumerator.eof).as("text/event-stream")
   }
