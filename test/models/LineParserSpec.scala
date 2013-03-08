@@ -54,6 +54,19 @@ class LineParserSpec extends Specification {
     }
   }
 
+  "a source from coordinates" should {
+    "be parsed into coordinates" in {
+      val source = Source.fromString(
+        """688	-5.5	10.3
+          |hello
+          |690	12.51	-70.01
+          |a	b	c""".stripMargin)
+      val input = lineEnumerator(source)
+      val values = joinValues(input &> lineParser &> validCoordinate)
+      values mustEqual List(Coordinate(-5.5,10.3), Coordinate(12.51, -70.01))
+    }
+  }
+
   /**
    * @return list of enumerated values of type A
    */
