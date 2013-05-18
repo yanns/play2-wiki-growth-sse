@@ -42,53 +42,56 @@
 
             var PI2 = Math.PI * 2;
             var feed,
-                eventsLength = 0;
+                eventsLength = 0,
+                data, x, y,
+                statusElem = document.getElementById('status'),
+                debugElem = document.getElementById('debug');
 
             if (!!window.EventSource) {
                 feed = new EventSource('/stream');
 
                 // connection was opened
                 feed.addEventListener('open', function (e) {
-                    $("#status").html("Connection open");
+                    statusElem.innerHTML = "Connection open";
                     $("#stop-stream").removeAttr("disabled");
                 }, false);
 
                 // receive message
                 feed.addEventListener('message', function(e) {
-                    $("#status").html("stream received");
-                    var data = JSON.parse(e.data);
+                    statusElem.innerHTML = "stream received";
+                    data = JSON.parse(e.data);
                     eventsLength += 1;
 
                     canvasContext.beginPath();
-                    var x = canvasCenterX + data.longitude * canvasCenterX / 180,
-                        y = canvasCenterY - data.latitude  * canvasCenterY / 90;
+                    x = canvasCenterX + data.longitude * canvasCenterX / 180;
+                    y = canvasCenterY - data.latitude  * canvasCenterY / 90;
                     canvasContext.arc(x, y, 1, 0, PI2);
                     canvasContext.fill();
 
-                    $('#debug').html( "number of points received: " + eventsLength );
+                    debugElem.innerHTML = "number of points received: " + eventsLength;
 
                 }, false);
 
                 // error handling
                 feed.addEventListener('error', function (e) {
                     if (e.eventPhase == EventSource.CLOSED) {
-                        $("#status").html("Connection closed");
+                        statusElem.innerHTML = "Connection closed";
                         $("#stop-stream").attr("disabled", "disabled");
                         feed.close();
                     } else {
-                        $("#status").html("Unknown error" + e);
+                        statusElem.innerHTML = "Unknown error" + e;
                         $("#stop-stream").attr("disabled", "disabled");
                     }
                 }, false);
 
             } else {
-                $("#status").html("Serverside Send Event not supported by this browser");
+                statusElem.innerHTML = "Serverside Send Event not supported by this browser";
             }
 
             $("#stop-stream").click(function(e) {
                 e.preventDefault();
                 feed.close();
-                $("#status").html("Streaming stopped");
+                statusElem.innerHTML = "Streaming stopped";
                 $(this).attr("disabled", "disabled");
             }).attr("disabled", "disabled");
         });
