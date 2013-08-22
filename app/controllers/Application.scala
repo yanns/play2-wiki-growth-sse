@@ -33,7 +33,7 @@ object Application extends Controller {
     val source = scala.io.Source.fromFile(Play.getExistingFile("conf/coosbyid.txt").get)
     val jsonStream = lineEnumerator(source) &> lineParser &> validCoordinate &> asJson
     val eventDataStream = jsonStream &> EventSource()
-    Ok.stream(eventDataStream >>> Enumerator.eof).as("text/event-stream")
+    Ok.stream(eventDataStream).as("text/event-stream")
   }
 
 }
