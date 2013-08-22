@@ -30,9 +30,7 @@
 
             var canvas = document.getElementById('plan2d'),
                 canvasContext = canvas.getContext('2d'),
-                canvasWidth = canvas.width,
-                canvasCenterX = canvas.width / 2
-                canvasHeight = canvas.height,
+                canvasCenterX = canvas.width / 2,
                 canvasCenterY =  canvas.height / 2;
 
             // paint it black
@@ -65,7 +63,7 @@
                     canvasContext.beginPath();
                     x = canvasCenterX + data.longitude * canvasCenterX / 180;
                     y = canvasCenterY - data.latitude  * canvasCenterY / 90;
-                    canvasContext.arc(x, y, 1, 0, PI2);
+                    canvasContext.arc(x, y, 1, 0, PI2, true);
                     canvasContext.fill();
 
                     debugElem.innerHTML = "number of points received: " + eventsLength;
