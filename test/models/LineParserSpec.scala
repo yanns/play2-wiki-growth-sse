@@ -1,11 +1,11 @@
 package models
 
-import org.specs2.mutable._
+import org.specs2.mutable.Specification
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import models.GrowthStream._
-import concurrent.duration.Duration
-import concurrent.Await
 import io.Source
+import play.api.test.Helpers.defaultAwaitTimeout
+import play.api.test.Helpers
 
 class LineParserSpec extends Specification {
 
@@ -70,9 +70,7 @@ class LineParserSpec extends Specification {
   /**
    * @return list of enumerated values of type A
    */
-  private def joinValues[A](values: Enumerator[A]): List[A] = {
-    val join = Iteratee.fold[A, List[A]](Nil)((list, el) => el :: list)
-    Await.result(Iteratee.flatten(values |>> join).run, Duration.Inf).reverse
-  }
+  private def joinValues[A](values: Enumerator[A]): List[A] =
+    Helpers.await(values.run(Iteratee.getChunks))
 
 }

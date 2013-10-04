@@ -2,13 +2,15 @@ package controllers
 
 import play.api._
 import libs.EventSource
-import libs.iteratee.{Enumerator, Enumeratee}
+import libs.iteratee.Enumeratee
 import libs.json.{Json, JsValue}
 import play.api.mvc._
 import play.api.Play.current
 import libs.json.Json._
 import models.Coordinate
 import models.GrowthStream._
+import play.api.libs.concurrent.Execution.Implicits._
+
 
 object Application extends Controller {
 
@@ -19,8 +21,8 @@ object Application extends Controller {
   /**
    * convert a coordinate to JSON
    */
-  val asJson: Enumeratee[Coordinate, JsValue] = Enumeratee.map[Coordinate] {
-    coordinate => Json.obj(
+  val asJson: Enumeratee[Coordinate, JsValue] = Enumeratee.map[Coordinate] { coordinate =>
+    Json.obj(
       "latitude" -> coordinate.latitude,
       "longitude" -> coordinate.longitude
     )
@@ -33,7 +35,7 @@ object Application extends Controller {
     val source = scala.io.Source.fromFile(Play.getExistingFile("conf/coosbyid.txt").get)
     val jsonStream = lineEnumerator(source) &> lineParser &> validCoordinate &> asJson
     val eventDataStream = jsonStream &> EventSource()
-    Ok.stream(eventDataStream).as("text/event-stream")
+    Ok.chunked(eventDataStream).as("text/event-stream")
   }
 
 }
