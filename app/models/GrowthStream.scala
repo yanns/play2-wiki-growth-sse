@@ -1,9 +1,10 @@
 package models
 
 import play.api.libs.iteratee.{Input, Enumeratee, Enumerator}
-import org.apache.commons.lang3.math.NumberUtils
 import concurrent.Future
 import io.Source
+import play.api.libs.concurrent.Execution.Implicits._
+import scala.util.Try
 
 case class Coordinate(latitude: BigDecimal, longitude: BigDecimal)
 
@@ -26,13 +27,8 @@ object GrowthStream {
   }
 
   object IsDouble {
-    def unapply(string: String): Option[Double] = {
-      if (NumberUtils.isNumber(string)) {
-        Some(string.toDouble)
-      } else {
-        None
-      }
-    }
+    def unapply(string: String): Option[Double] =
+      Try(string.toDouble).toOption
   }
 
   /**
