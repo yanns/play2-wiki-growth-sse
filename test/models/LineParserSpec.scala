@@ -3,7 +3,7 @@ package models
 import org.specs2.mutable.Specification
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import models.GrowthStream._
-import io.Source
+import scala.io.Source
 import play.api.test.Helpers.defaultAwaitTimeout
 import play.api.test.Helpers
 

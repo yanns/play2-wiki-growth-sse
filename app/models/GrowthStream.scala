@@ -2,7 +2,7 @@ package models
 
 import play.api.libs.iteratee.{Input, Enumeratee, Enumerator}
 import concurrent.Future
-import io.Source
+import scala.io.Source
 import play.api.libs.concurrent.Execution.Implicits._
 import scala.util.Try
 
