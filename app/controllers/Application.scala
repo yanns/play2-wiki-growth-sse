@@ -12,7 +12,7 @@ import models.GrowthStream._
 import play.api.libs.concurrent.Execution.Implicits._
 
 
-object Application extends Controller {
+class Application(env: Environment) extends Controller {
 
   def index = Action {
     Ok(views.html.index())
@@ -32,7 +32,7 @@ object Application extends Controller {
    * Stream of server send events
    */
   def stream() = Action {
-    val source = scala.io.Source.fromFile(Play.getExistingFile("conf/coosbyid.txt").get)
+    val source = scala.io.Source.fromFile(env.getExistingFile("conf/coosbyid.txt").get)
     val jsonStream = lineEnumerator(source) &> lineParser &> validCoordinate &> asJson
     val eventDataStream = jsonStream &> EventSource()
     Ok.chunked(eventDataStream).as("text/event-stream")
