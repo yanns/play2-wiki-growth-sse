@@ -1,15 +1,14 @@
 package controllers
 
-import play.api._
-import libs.EventSource
-import libs.iteratee.Enumeratee
-import libs.json.{Json, JsValue}
-import play.api.mvc._
-import play.api.Play.current
-import libs.json.Json._
+import akka.stream.scaladsl.{FileIO, Source}
 import models.Coordinate
 import models.GrowthStream._
-import play.api.libs.concurrent.Execution.Implicits._
+import play.api._
+import play.api.http.ContentTypes
+import play.api.libs.EventSource
+import play.api.libs.json.Json._
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc._
 
 
 class Application(env: Environment) extends Controller {
@@ -21,21 +20,21 @@ class Application(env: Environment) extends Controller {
   /**
    * convert a coordinate to JSON
    */
-  val asJson: Enumeratee[Coordinate, JsValue] = Enumeratee.map[Coordinate] { coordinate =>
+  def asJson(coordinate: Coordinate): JsValue =
     Json.obj(
       "latitude" -> coordinate.latitude,
       "longitude" -> coordinate.longitude
     )
-  }
 
   /**
    * Stream of server send events
    */
   def stream() = Action {
-    val source = scala.io.Source.fromFile(env.getExistingFile("conf/coosbyid.txt").get)
-    val jsonStream = lineEnumerator(source) &> lineParser &> validCoordinate &> asJson
-    val eventDataStream = jsonStream &> EventSource()
-    Ok.chunked(eventDataStream).as("text/event-stream")
+
+    val source = FileIO.fromFile(env.getExistingFile("conf/coosbyid.txt").get, 300)
+    val jsonStream: Source[JsValue, _] = source.via(flow).map(asJson)
+
+    Ok.chunked(jsonStream via EventSource.flow).as(ContentTypes.EVENT_STREAM)
   }
 
 }
