@@ -11,3 +11,5 @@ libraryDependencies ++= (
   "com.typesafe.akka" %% "akka-stream-testkit" % "2.4.2" ::
   Nil
 ) map (_ % Test)
+
+herokuAppName in Compile := "wiki-growth"
