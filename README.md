@@ -13,3 +13,10 @@ The browser displays this coordinate on a map, showing how wikipedia has spread 
 The demo can be view [online on Heroku](http://wiki-growth.herokuapp.com/).
 The code is explained on a [blog post](http://yanns.github.io/blog/2012/08/12/handling-data-streams-with-play2-and-server-send-events/).
 
+## How to run
+
+Be sure you have [`sbt` installed](http://www.scala-sbt.org/)
+
+```
+sbt run
+```
